@@ -1,106 +1,24 @@
 from tkinter import Tk, Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
-from requests import get
+
 from threading import Thread
 from datetime import datetime
 from pystray import MenuItem as item
 from pystray import Icon, Menu
-from PIL import Image, ImageDraw, ImageFont
-from configparser import ConfigParser
+
+
 from tools.bucang import get_required_shares
+from config import init_conf
+from tools.market_data_tool import get_one_stock_data,get_stock_data
+from tools.ico_tool import create_image
+from tools.state_manager import State_Box
+from UI.model.replenish import replenish_stock
+from UI.model.forewarning import send_warning
+from UI.model.notify_box import notify_box
 
 
-class init_config():
-    def __init__(self, config_file: str):
-        cfg = ConfigParser()
-        cfg.read(config_file, encoding='utf-8')
-        self.cfg = cfg
-
-    def get_value(self, section, key):
-        if section in self.cfg:
-            return self.cfg[section][key]
-        else:
-            raise Exception(f"配置项不存在{section}.{key}")
-
-    def get_keys(self, section):
-        keys = []
-        for i in self.cfg[section]:
-            keys.append(i)
-        return keys
-
-
-init_conf = init_config("config.ini")
 stocks = init_conf.get_keys("stock")
 ms = init_conf.get_value("update", 'time')
-
-
-# 获取多个股票的实时数据
-def get_stock_data():
-    stock_urls = {}
-    stock_ben = {}
-    for name in stocks:
-        stockvlue = init_conf.get_value("stock", name)
-        _ = stockvlue.split(";")
-        stock = _[0]
-        stock_ben[name] = _[1] if len(_) > 1 else 0
-        stock_urls[name] = f"https://hq.sinajs.cn/list={stock}"
-
-    headers = {"Referer": "https://finance.sina.com.cn"}
-    stock_data = {}
-    for stock_name, url in stock_urls.items():
-        response = get(url, headers=headers)
-        data = response.text.split(",")
-        if len(data) > 30:
-            current_index = data[3]
-            yesterday_index = data[2]
-            stock_data[stock_name] = [current_index, stock_ben.get(stock_name), yesterday_index]
-        else:
-            stock_data[stock_name] = f"{stock_name}: 无法获取数据"
-    return stock_data
-
-
-# 获取多个股票的实时数据
-def get_one_stock_data(stock):
-    stock_urls = {}
-    stock_ben = {}
-    for name in [stock]:
-        stockvlue = init_conf.get_value("stock", name)
-        _ = stockvlue.split(";")
-        stock = _[0]
-        stock_ben[name] = _[1] if len(_) > 1 else 0
-        stock_urls[name] = f"https://hq.sinajs.cn/list={stock}"
-
-    headers = {"Referer": "https://finance.sina.com.cn"}
-    stock_data = {}
-    stock_name = ''
-    for stock_name, url in stock_urls.items():
-        response = get(url, headers=headers)
-        data = response.text.split(",")
-        if len(data) > 30:
-            current_index = data[3]
-            yesterday_index = data[2]
-            stock_data[stock_name] = [current_index, stock_ben.get(stock_name), yesterday_index]
-        else:
-            stock_data[stock_name] = f"{stock_name}: 无法获取数据"
-    return stock_data[stock_name]
-
-
-# 托盘相关代码
-def create_image():
-    """ 创建托盘图标 """
-    image = Image.new('RGB', (64, 64), (0, 0, 0))
-    d = ImageDraw.Draw(image)
-    # 创建一个字体对象，指定字体和大小
-    try:
-        font = ImageFont.truetype("arial.ttf", 64)  # 使用 Arial 字体，大小为 30
-    except IOError:
-        font = ImageFont.load_default()  # 如果找不到字体，使用默认字体
-
-    # 绘制蓝色矩形
-    d.rectangle((0, 0, 64, 64), fill="black")
-    # 绘制较大的白色字母 "S"
-    d.text((10, 15), "A", fill="white", font=font)  # Y 坐标稍微向下移动
-    return image
-
+State_Box.set_state("stocks", stocks)
 
 class jk_ui:
     def __init__(self):
@@ -124,14 +42,10 @@ class jk_ui:
             item('关闭', self.quit_window)
         ))
 
-        self.hjg_value = 0
-        self.ljg_value = 0
-        self.yj_h_status = 0
-        self.yj_l_status = 0
 
-        Thread(target=self.icon.run, daemon=True).start()
 
     def creat_main_ui(self):
+        Thread(target=self.icon.run, daemon=True).start()
         # 绑定鼠标事件实现窗口拖动
         self.root.bind("<Button-1>", self.start_move)
         self.root.bind("<B1-Motion>", self.on_motion)
@@ -184,107 +98,43 @@ class jk_ui:
         self.stock_bucang_info_label.config(text=bucang_info)
 
     def set_yj(self):
-        self.hjg_value = self.hjg.get() if self.hjg.get() else 0
-        self.ljg_value = self.ljg.get() if self.ljg.get() else 0
-        vlaue = f"设置成功 预警上限：{self.hjg_value} 预警下限：{self.ljg_value}"
+        State_Box.set_state("hjg_value",self.hjg.get() if self.hjg.get() else 0)
+        State_Box.set_state("ljg_value",self.ljg.get() if self.ljg.get() else 0)
+        vlaue = f"设置成功 预警上限：{State_Box.get_state('hjg_value')} 预警下限：{State_Box.get_state('ljg_value')}"
         self.stock_yj_info_label.config(text=vlaue)
-        self.yj_h_status = 0
-        self.yj_l_status = 0
+        State_Box.set_state("yj_h_status", 0)
+        State_Box.set_state("yj_l_status", 0)
+
 
     def yujing(self, icon, item):
-        # 创建补仓计算窗口
-        yujing_window = Toplevel(self.root)
-        yujing_window.title("预警")
-        yujing_window.geometry("400x400")
-
-        self.selected_stock = StringVar(value=stocks[0])
-        Label(yujing_window, text="选择股票:").pack()
-        for stock in stocks:
-            Radiobutton(yujing_window, text=stock, variable=self.selected_stock, value=stock).pack(anchor='w')
-        Button(yujing_window, text="获取股票数据", command=self.get_stock_jg).pack()
-
-        # 将标签和输入框放在同一行
-        def add_labeled_entry(label_text):
-            frame = Frame(yujing_window)
-            frame.pack(padx=10, pady=5, fill='x')
-            Label(frame, text=label_text).pack(side='left')
-            entry = Entry(frame)
-            entry.pack(side='left', expand=True, fill='x')
-            return entry
-
-        self.entry_cost = add_labeled_entry("成本价格:")
-        self.entry_current_price = add_labeled_entry("当前价格:")
-        self.hjg = add_labeled_entry("预警上限:")
-        self.ljg = add_labeled_entry("预警下限:")
-        self.hjg.pack()
-        self.ljg.pack()
-
-        self.entry_cost.pack()
-        self.entry_current_price.pack()
-
-        Button(yujing_window, text="设置", command=self.set_yj).pack()
-        self.stock_yj_info_label = Label(yujing_window, text="")
-        self.stock_yj_info_label.pack()
+        send_warning(self,icon, item)
 
     def bucang(self, icon, item):
-        # 创建补仓计算窗口
-        buchang_window = Toplevel(self.root)
-        buchang_window.title("补仓计算")
-        buchang_window.geometry("400x400")
+        replenish_stock(self,icon, item)
 
-        self.selected_stock = StringVar(value=stocks[0])
-        Label(buchang_window, text="选择股票:").pack()
-        for stock in stocks:
-            Radiobutton(buchang_window, text=stock, variable=self.selected_stock, value=stock).pack(anchor='w')
-        Button(buchang_window, text="获取股票数据", command=self.get_stock_jg).pack()
-
-        # 将标签和输入框放在同一行
-        def add_labeled_entry(label_text):
-            frame = Frame(buchang_window)
-            frame.pack(padx=10, pady=5, fill='x')
-            Label(frame, text=label_text).pack(side='left')
-            entry = Entry(frame)
-            entry.pack(side='left', expand=True, fill='x')
-            return entry
-
-        self.entry_cost = add_labeled_entry("成本价格:")
-        self.entry_current_price = add_labeled_entry("当前价格:")
-        self.entry_target_price = add_labeled_entry("目标价格:")
-        self.entry_holding = add_labeled_entry("持有数量:")
-
-        self.entry_holding.pack()
-        self.entry_cost.pack()
-        self.entry_current_price.pack()
-        self.entry_target_price.pack()
-        Button(buchang_window, text="计算", command=self.get_bucang_rel).pack()
-        self.stock_bucang_info_label = Label(buchang_window, text="")
-        self.stock_bucang_info_label.pack()
-
-    # 定义点击菜单项的回调函数
     def on_notify(self, icon, item):
-        if item == "h":
-            icon.notify(title="预警上限", message="老板发财了")
-            self.yj_h_status = 1
-        if item == "l":
-            icon.notify(title="预警下限", message="老板准备跑路了")
-            self.yj_l_status = 1
+        notify_box(self,icon, item)
 
     # 更新浮窗内容
     def update_label(self):
         now = datetime.now()
         if 9 <= now.hour < 16 or len(self.stock_frame.winfo_children()) == 0:
             try:
-                stock_values = get_stock_data()
+                stock_values = get_stock_data(stocks)
                 for widget in self.stock_frame.winfo_children():
                     widget.destroy()
 
                 max_width = 0
                 for stock_name, stock_v in stock_values.items():
-                    if self.hjg_value != 0 and self.yj_h_status == 0:
-                        if float(stock_v[0]) > float(self.hjg_value):
+                    hjg_value=State_Box.get_state("hjg_value")
+                    ljg_value=State_Box.get_state("ljg_value")
+                    yj_h_status=State_Box.get_state("yj_h_status")
+                    yj_l_status=State_Box.get_state("yj_l_status")
+                    if hjg_value != 0 and yj_h_status == 0:
+                        if float(stock_v[0]) > float(hjg_value):
                             self.on_notify(self.icon, "h")
-                    if self.ljg_value != 0 and self.yj_l_status == 0:
-                        if float(stock_v[0]) < float(self.ljg_value):
+                    if ljg_value != 0 and yj_l_status == 0:
+                        if float(stock_v[0]) < float(ljg_value):
                             self.on_notify(self.icon, "l")
 
                     if float(stock_v[1]) == 0:
