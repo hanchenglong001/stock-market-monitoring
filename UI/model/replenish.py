@@ -1,19 +1,37 @@
 from tkinter import  Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
 from tools.state_manager import State_Box
+from tools.market_data_tool import get_one_stock_data
+from tools.bucang import get_required_shares
 
 
-def replenish_stock(self, icon, item):
+def replenish_stock(root):
+    def get_stock_jg():
+        stock_data = get_one_stock_data(selected_stock.get())
+
+        entry_cost.delete(0, 'end')  # 清空输入框
+        entry_cost.insert(0, stock_data[1])  # 插入当前价格
+        entry_current_price.delete(0, 'end')  # 清空输入框
+        entry_current_price.insert(0, stock_data[0])  # 插入当前价格
+        print(stock_data)
+        pass
+
+    def get_bucang_rel():
+        bucang_info = get_required_shares(entry_holding.get(), entry_cost.get(),
+                                          entry_current_price.get(), entry_target_price.get())
+        stock_bucang_info_label.config(text=bucang_info)
+
+
     # 创建补仓计算窗口
-    buchang_window = Toplevel(self.root)
+    buchang_window = Toplevel(root)
     buchang_window.title("补仓计算")
     buchang_window.geometry("400x400")
 
     stocks=State_Box.get_state("stocks")
-    self.selected_stock = StringVar(value=stocks[0])
+    selected_stock = StringVar(value=stocks[0])
     Label(buchang_window, text="选择股票:").pack()
     for stock in stocks:
-        Radiobutton(buchang_window, text=stock, variable=self.selected_stock, value=stock).pack(anchor='w')
-    Button(buchang_window, text="获取股票数据", command=self.get_stock_jg).pack()
+        Radiobutton(buchang_window, text=stock, variable=selected_stock, value=stock).pack(anchor='w')
+    Button(buchang_window, text="获取股票数据", command=get_stock_jg).pack()
 
     # 将标签和输入框放在同一行
     def add_labeled_entry(label_text):
@@ -24,15 +42,16 @@ def replenish_stock(self, icon, item):
         entry.pack(side='left', expand=True, fill='x')
         return entry
 
-    self.entry_cost = add_labeled_entry("成本价格:")
-    self.entry_current_price = add_labeled_entry("当前价格:")
-    self.entry_target_price = add_labeled_entry("目标价格:")
-    self.entry_holding = add_labeled_entry("持有数量:")
 
-    self.entry_holding.pack()
-    self.entry_cost.pack()
-    self.entry_current_price.pack()
-    self.entry_target_price.pack()
-    Button(buchang_window, text="计算", command=self.get_bucang_rel).pack()
-    self.stock_bucang_info_label = Label(buchang_window, text="")
-    self.stock_bucang_info_label.pack()
+    entry_cost = add_labeled_entry("成本价格:")
+    entry_current_price = add_labeled_entry("当前价格:")
+    entry_target_price = add_labeled_entry("目标价格:")
+    entry_holding = add_labeled_entry("持有数量:")
+
+    entry_holding.pack()
+    entry_cost.pack()
+    entry_current_price.pack()
+    entry_target_price.pack()
+    Button(buchang_window, text="计算", command=get_bucang_rel).pack()
+    stock_bucang_info_label = Label(buchang_window, text="")
+    stock_bucang_info_label.pack()

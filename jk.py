@@ -1,18 +1,11 @@
 from tkinter import Tk, Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
-
 from threading import Thread
 from datetime import datetime
-from pystray import MenuItem as item
-from pystray import Icon, Menu
 
-
-from tools.bucang import get_required_shares
 from config import init_conf
 from tools.market_data_tool import get_one_stock_data,get_stock_data
 from tools.ico_tool import create_image,creat_ico
 from tools.state_manager import State_Box
-from UI.model.replenish import replenish_stock
-from UI.model.forewarning import send_warning
 from UI.model.notify_box import notify_box
 
 
@@ -37,7 +30,6 @@ class jk_ui:
         self.icon = creat_ico(self)
 
 
-
     def creat_main_ui(self):
         Thread(target=self.icon.run, daemon=True).start()
         # 绑定鼠标事件实现窗口拖动
@@ -60,7 +52,7 @@ class jk_ui:
         self.root.withdraw()  # 隐藏窗口
 
         if self.icon is None:  # 检查是否已经存在托盘图标
-            icon = creat_ico(self)
+            icon = creat_ico(self.root)
             Thread(target=icon.run, daemon=True).start()
         else:
             self.icon.visible = True  # 如果托盘图标已存在，则使其可见
@@ -69,38 +61,6 @@ class jk_ui:
         """ 显示窗口 """
         self.root.deiconify()
 
-    def get_stock_jg(self):
-        stock_data = get_one_stock_data(self.selected_stock.get())
-
-        self.entry_cost.delete(0, 'end')  # 清空输入框
-        self.entry_cost.insert(0, stock_data[1])  # 插入当前价格
-        self.entry_current_price.delete(0, 'end')  # 清空输入框
-        self.entry_current_price.insert(0, stock_data[0])  # 插入当前价格
-        print(stock_data)
-        pass
-
-    def get_bucang_rel(self):
-        bucang_info = get_required_shares(self.entry_holding.get(), self.entry_cost.get(),
-                                          self.entry_current_price.get(), self.entry_target_price.get())
-        self.stock_bucang_info_label.config(text=bucang_info)
-
-    def set_yj(self):
-        State_Box.set_state("hjg_value",self.hjg.get() if self.hjg.get() else 0)
-        State_Box.set_state("ljg_value",self.ljg.get() if self.ljg.get() else 0)
-        vlaue = f"设置成功 预警上限：{State_Box.get_state('hjg_value')} 预警下限：{State_Box.get_state('ljg_value')}"
-        self.stock_yj_info_label.config(text=vlaue)
-        State_Box.set_state("yj_h_status", 0)
-        State_Box.set_state("yj_l_status", 0)
-
-
-    def yujing(self, icon, item):
-        send_warning(self,icon, item)
-
-    def bucang(self, icon, item):
-        replenish_stock(self,icon, item)
-
-    def on_notify(self, icon, item):
-        notify_box(self,icon, item)
 
     # 更新浮窗内容
     def update_label(self):
@@ -119,10 +79,10 @@ class jk_ui:
                     yj_l_status=State_Box.get_state("yj_l_status")
                     if hjg_value != 0 and yj_h_status == 0:
                         if float(stock_v[0]) > float(hjg_value):
-                            self.on_notify(self.icon, "h")
+                            notify_box(self.icon, "h")
                     if ljg_value != 0 and yj_l_status == 0:
                         if float(stock_v[0]) < float(ljg_value):
-                            self.on_notify(self.icon, "l")
+                            notify_box(self.icon, "l")
 
                     if float(stock_v[1]) == 0:
                         difference, differenceb = "", "*"

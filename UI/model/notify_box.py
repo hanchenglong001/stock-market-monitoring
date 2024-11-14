@@ -2,7 +2,7 @@ from tools.state_manager import State_Box
 
 
 # 定义点击菜单项的回调函数
-def notify_box(self, icon, item):
+def notify_box(icon, item):
     if item == "h":
         icon.notify(title="预警上限", message="老板发财了")
         State_Box.set_state("yj_h_status", 1)
