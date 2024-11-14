@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Frame, Toplevel, Entry, Button, messagebox, StringVar, Radiobutton
+from tkinter import Tk, Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
 from requests import get
 from threading import Thread
 from datetime import datetime
@@ -6,7 +6,7 @@ from pystray import MenuItem as item
 from pystray import Icon, Menu
 from PIL import Image, ImageDraw, ImageFont
 from configparser import ConfigParser
-from bucang import get_required_shares
+from tools.bucang import get_required_shares
 
 
 class init_config():
