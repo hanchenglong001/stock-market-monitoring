@@ -2,7 +2,7 @@ from tkinter import  Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutt
 from tools.state_manager import State_Box
 from tools.market_data_tool import get_one_stock_data
 from tools.bucang import get_required_shares
-from UI.model.labeled_entry import add_labeled_entry
+from UI.small_module.labeled_entry import add_labeled_entry
 
 
 def replenish_stock(root):

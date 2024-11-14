@@ -6,7 +6,7 @@ from config import init_conf
 from tools.market_data_tool import get_one_stock_data,get_stock_data
 from tools.ico_tool import create_image,creat_ico
 from tools.state_manager import State_Box
-from UI.model.notify_box import notify_box
+from UI.small_module.notify_box import notify_box
 
 
 stocks = init_conf.get_keys("stock")
@@ -26,11 +26,12 @@ class jk_ui:
         self.stock_frame = Frame(self.root, bg="black")
         self.stock_frame.pack()
 
-        # 创建托盘图标
-        self.icon = creat_ico(self)
+
 
 
     def creat_main_ui(self):
+        # 创建托盘图标
+        self.icon = creat_ico(self)
         Thread(target=self.icon.run, daemon=True).start()
         # 绑定鼠标事件实现窗口拖动
         self.root.bind("<Button-1>", self.start_move)

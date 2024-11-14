@@ -1,7 +1,7 @@
 from tkinter import Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
 from tools.state_manager import State_Box
 from tools.market_data_tool import get_one_stock_data
-from UI.model.labeled_entry import add_labeled_entry
+from UI.small_module.labeled_entry import add_labeled_entry
 
 
 def send_warning(root):

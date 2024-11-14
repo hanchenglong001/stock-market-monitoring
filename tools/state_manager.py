@@ -13,7 +13,6 @@ class StateManager_Box:
             self._history = []  # 可选，存储状态变化历史
             self._initialized = True
 
-
             ##预警上限
             self.set_state("hjg_value", 0)
             ##预警上限状态
