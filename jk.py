@@ -9,7 +9,7 @@ from pystray import Icon, Menu
 from tools.bucang import get_required_shares
 from config import init_conf
 from tools.market_data_tool import get_one_stock_data,get_stock_data
-from tools.ico_tool import create_image
+from tools.ico_tool import create_image,creat_ico
 from tools.state_manager import State_Box
 from UI.model.replenish import replenish_stock
 from UI.model.forewarning import send_warning
@@ -34,13 +34,7 @@ class jk_ui:
         self.stock_frame.pack()
 
         # 创建托盘图标
-        self.icon = Icon("stock_tracker", create_image(), menu=Menu(
-            item('预警', self.yujing),
-            item('补仓', self.bucang),
-            item('打开', self.show_window),
-            item('最小化', self.minimize_to_tray),
-            item('关闭', self.quit_window)
-        ))
+        self.icon = creat_ico(self)
 
 
 
@@ -66,14 +60,7 @@ class jk_ui:
         self.root.withdraw()  # 隐藏窗口
 
         if self.icon is None:  # 检查是否已经存在托盘图标
-            icon = Icon("stock_tracker", create_image(), menu=Menu(
-                item('预警', self.yujing),
-                item('补仓', self.bucang),
-                item('打开', self.show_window),
-                item('最小化', self.minimize_to_tray),
-                item('关闭', self.quit_window)
-
-            ))
+            icon = creat_ico(self)
             Thread(target=icon.run, daemon=True).start()
         else:
             self.icon.visible = True  # 如果托盘图标已存在，则使其可见

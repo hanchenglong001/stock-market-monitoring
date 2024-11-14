@@ -1,4 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
+from pystray import MenuItem as item
+from pystray import Icon, Menu
 
 # 托盘相关代码
 def create_image():
@@ -16,3 +18,13 @@ def create_image():
     # 绘制较大的白色字母 "S"
     d.text((10, 15), "A", fill="white", font=font)  # Y 坐标稍微向下移动
     return image
+
+def creat_ico(self):
+    return Icon("stock_tracker", create_image(), menu=Menu(
+        item('预警', self.yujing),
+        item('补仓', self.bucang),
+        item('打开', self.show_window),
+        item('最小化', self.minimize_to_tray),
+        item('关闭', self.quit_window)
+
+    ))
