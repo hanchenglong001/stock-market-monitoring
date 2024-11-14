@@ -2,6 +2,7 @@ from tkinter import  Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutt
 from tools.state_manager import State_Box
 from tools.market_data_tool import get_one_stock_data
 from tools.bucang import get_required_shares
+from UI.model.labeled_entry import add_labeled_entry
 
 
 def replenish_stock(root):
@@ -33,20 +34,13 @@ def replenish_stock(root):
         Radiobutton(buchang_window, text=stock, variable=selected_stock, value=stock).pack(anchor='w')
     Button(buchang_window, text="获取股票数据", command=get_stock_jg).pack()
 
-    # 将标签和输入框放在同一行
-    def add_labeled_entry(label_text):
-        frame = Frame(buchang_window)
-        frame.pack(padx=10, pady=5, fill='x')
-        Label(frame, text=label_text).pack(side='left')
-        entry = Entry(frame)
-        entry.pack(side='left', expand=True, fill='x')
-        return entry
 
 
-    entry_cost = add_labeled_entry("成本价格:")
-    entry_current_price = add_labeled_entry("当前价格:")
-    entry_target_price = add_labeled_entry("目标价格:")
-    entry_holding = add_labeled_entry("持有数量:")
+
+    entry_cost = add_labeled_entry(buchang_window,"成本价格:")
+    entry_current_price = add_labeled_entry(buchang_window,"当前价格:")
+    entry_target_price = add_labeled_entry(buchang_window,"目标价格:")
+    entry_holding = add_labeled_entry(buchang_window,"持有数量:")
 
     entry_holding.pack()
     entry_cost.pack()
