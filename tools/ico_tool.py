@@ -3,6 +3,7 @@ from pystray import MenuItem as item
 from pystray import Icon, Menu
 from UI.model.replenish import replenish_stock
 from UI.model.forewarning import send_warning
+from UI.model.nephogram import open_stock_plate
 
 # 托盘相关代码
 def create_image():
@@ -26,6 +27,7 @@ def create_image():
 
 def creat_ico(self):
     return Icon("stock_tracker", create_image(), menu=Menu(
+        item('大盘云图', open_stock_plate),
         item('预警', lambda: send_warning(self.root)),
         item('补仓', lambda: replenish_stock(self.root)),
         item('打开', self.show_window),
