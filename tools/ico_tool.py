@@ -4,7 +4,8 @@ from pystray import Icon, Menu
 from UI.model.replenish import replenish_stock
 from UI.model.forewarning import send_warning
 from UI.model.nephogram import open_stock_plate
-# from UI.model.setup_module import open_stock_plate
+from UI.small_module.about_software import software_info
+
 
 # 托盘相关代码
 def create_image():
@@ -28,12 +29,13 @@ def create_image():
 
 def creat_ico(self):
     return Icon("stock_tracker", create_image(), menu=Menu(
+  item('关于', lambda: software_info(self.root)),
         item('大盘云图', open_stock_plate),
         item('预警', lambda: send_warning(self.root)),
         item('补仓', lambda: replenish_stock(self.root)),
         item('打开', self.show_window),
-        # item('设置', ),
         item('最小化', self.minimize_to_tray),
         item('关闭', self.quit_window)
+
 
     ))

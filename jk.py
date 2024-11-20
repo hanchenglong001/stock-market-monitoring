@@ -20,7 +20,6 @@ class jk_ui:
         self.icon = None
         # 创建一个透明浮窗
         self.root = Tk()
-        self.root.withdraw()
         self.root.overrideredirect(True)
         self.root.geometry("+1000+100")
         self.root.configure(bg="black")
@@ -55,7 +54,7 @@ class jk_ui:
         self.root.withdraw()  # 隐藏窗口
 
         if self.icon is None:  # 检查是否已经存在托盘图标
-            icon = creat_ico(self.root)
+            icon = creat_ico(self)
             Thread(target=icon.run, daemon=True).start()
         else:
             self.icon.visible = True  # 如果托盘图标已存在，则使其可见
