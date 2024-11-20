@@ -28,7 +28,6 @@ def create_image():
 
 
 def creat_ico(self):
-    window_state=State_Box.get_state("window_state")
     return Icon("stock_tracker", create_image(), menu=Menu(
         item('关于', lambda: software_info(self.root)),
         item('工具', Menu(
