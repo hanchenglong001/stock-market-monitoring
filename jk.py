@@ -1,12 +1,13 @@
-from tkinter import Tk, Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
+from tkinter import Tk, Label, Frame,Menu
 from threading import Thread
 from datetime import datetime
 
 from config import init_conf
-from tools.market_data_tool import get_one_stock_data,get_stock_data
-from tools.ico_tool import create_image,creat_ico
+from tools.market_data_tool import get_stock_data
+from tools.ico_tool import creat_ico
 from tools.state_manager import State_Box
 from UI.small_module.notify_box import notify_box
+
 
 
 stocks = init_conf.get_keys("stock")
@@ -19,6 +20,7 @@ class jk_ui:
         self.icon = None
         # 创建一个透明浮窗
         self.root = Tk()
+        self.root.withdraw()
         self.root.overrideredirect(True)
         self.root.geometry("+1000+100")
         self.root.configure(bg="black")
@@ -128,3 +130,7 @@ class jk_ui:
 if __name__ == '__main__':
     jk_ui = jk_ui()
     jk_ui.creat_main_ui()
+
+
+
+

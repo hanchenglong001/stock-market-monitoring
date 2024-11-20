@@ -1,12 +1,14 @@
 from tkinter import Label, Frame, Toplevel, Entry, Button, StringVar, Radiobutton
 from tools.state_manager import State_Box
-from tools.market_data_tool import get_one_stock_data
+from tools.market_data_tool import get_stock_data
 from UI.small_module.labeled_entry import add_labeled_entry
+
 
 
 def send_warning(root):
     def get_stock_jg():
-        stock_data = get_one_stock_data(selected_stock.get())
+        stock_name=selected_stock.get()
+        stock_data = get_stock_data(stock_name).get(stock_name)
 
         entry_cost.delete(0, 'end')  # 清空输入框
         entry_cost.insert(0, stock_data[1])  # 插入当前价格
