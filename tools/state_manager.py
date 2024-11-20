@@ -22,6 +22,9 @@ class StateManager_Box:
             ##预警下限状态
             self.set_state("yj_l_status", 0)
 
+            ##窗口可见状态
+            self.set_state("window_state", 1)
+
         else:
             # 如果已经初始化过，则不执行初始化代码
             print("实例化过了")

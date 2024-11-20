@@ -50,8 +50,15 @@ class jk_ui:
         self.root.quit()
 
     def minimize_to_tray(self, event):
-        """ 隐藏窗口并显示托盘图标 """
-        self.root.withdraw()  # 隐藏窗口
+        if State_Box.get_state("window_state"):
+            """ 隐藏窗口并显示托盘图标 """
+            self.root.withdraw()  # 隐藏窗口
+            State_Box.set_state("window_state", 0)
+        else:
+            """ 显示窗口 """
+            self.root.deiconify()
+            State_Box.set_state("window_state", 1)
+
 
         if self.icon is None:  # 检查是否已经存在托盘图标
             icon = creat_ico(self)
@@ -59,9 +66,6 @@ class jk_ui:
         else:
             self.icon.visible = True  # 如果托盘图标已存在，则使其可见
 
-    def show_window(self, icon, item):
-        """ 显示窗口 """
-        self.root.deiconify()
 
 
     # 更新浮窗内容

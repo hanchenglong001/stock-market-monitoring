@@ -5,7 +5,7 @@ from UI.model.replenish import replenish_stock
 from UI.model.forewarning import send_warning
 from UI.model.nephogram import open_stock_plate
 from UI.small_module.about_software import software_info
-
+from tools.state_manager import State_Box
 
 # 托盘相关代码
 def create_image():
@@ -28,14 +28,14 @@ def create_image():
 
 
 def creat_ico(self):
+    window_state=State_Box.get_state("window_state")
     return Icon("stock_tracker", create_image(), menu=Menu(
-  item('关于', lambda: software_info(self.root)),
+        item('关于', lambda: software_info(self.root)),
+        item('工具', Menu(
         item('大盘云图', open_stock_plate),
-        item('预警', lambda: send_warning(self.root)),
-        item('补仓', lambda: replenish_stock(self.root)),
-        item('打开', self.show_window),
-        item('最小化', self.minimize_to_tray),
+               item('预警', lambda: send_warning(self.root)),
+               item('补仓', lambda: replenish_stock(self.root)),
+        )),
+        item( "展示/隐藏", self.minimize_to_tray),
         item('关闭', self.quit_window)
-
-
     ))
