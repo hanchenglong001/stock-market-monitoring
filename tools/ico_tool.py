@@ -4,8 +4,11 @@ from pystray import Icon, Menu
 from UI.model.replenish import replenish_stock
 from UI.model.forewarning import send_warning
 from UI.model.nephogram import open_stock_plate
+from UI.model.bk_show import show_dropdown_bk
 from UI.small_module.about_software import software_info
-from tools.state_manager import State_Box
+
+
+
 
 # 托盘相关代码
 def create_image():
@@ -34,6 +37,7 @@ def creat_ico(self):
         item('大盘云图', open_stock_plate),
                item('预警', lambda: send_warning(self.root)),
                item('补仓', lambda: replenish_stock(self.root)),
+               item('板块数据',lambda: show_dropdown_bk(self.root)),
         )),
         item( "展示/隐藏", self.minimize_to_tray),
         item('关闭', self.quit_window)
