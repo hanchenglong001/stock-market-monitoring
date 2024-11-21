@@ -12,7 +12,9 @@ from UI.small_module.notify_box import notify_box
 
 stocks = init_conf.get_keys("stock")
 ms = init_conf.get_value("update", 'time')
+bkms = init_conf.get_value("bk_upate", 'time')
 State_Box.set_state("stocks", stocks)
+State_Box.set_state("bkms", bkms)
 
 class jk_ui:
     def __init__(self):

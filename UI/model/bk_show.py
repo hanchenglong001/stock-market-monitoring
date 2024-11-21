@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import Label, Frame, Toplevel, ttk
 from tools.market_bk_data import get_bk_info
 from threading import Timer
-
+from tools.state_manager import State_Box
 
 # 定义更新表格数据的函数
 def update_table(tree,root):
@@ -20,7 +20,8 @@ def update_table(tree,root):
             item['行业名称'], item['最新价'], item['涨跌幅（百分比）'], item['成交量（手）'], item['成交额（元）']))
 
     # 定时刷新，每30秒更新一次
-    Timer(30, update_table, [tree,root]).start()
+    bkms=int(State_Box.get_state("bkms"))
+    Timer(bkms, update_table, [tree,root]).start()
 
 
 def show_dropdown_bk(root):
