@@ -2,8 +2,13 @@ import hashlib
 import json
 import os
 from flask import Flask, request, jsonify
+import akshare as ak
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
+
+
+
 
 def get_all_files(directory):
     # 获取目录下所有的文件名（不包括子目录）
@@ -19,9 +24,12 @@ def get_all_files(directory):
 @app.route('/')
 def hello_world():
     return 'Hello from Flask!'
+
 user_tokens={}
 user_tokens["users"] = get_all_files("./config")
 # 验证 token 是否有效
+
+
 def verify_token(token):
     # 在实际应用中，可以通过数据库或缓存来验证 token 是否有效
     return token in user_tokens.get("users")
@@ -201,6 +209,27 @@ def set_json_info(path,json_data):
         return False
 
 
+@app.route('/get/stock/a', methods=['GET'])
+def get_stocks():
+    stocks=user_tokens.get("stocks")
+    if stocks:
+        return stocks
+    else:
+        return jsonify({})
+
+
+def get_A_stocks():
+    # 获取所有 A 股的股票代码
+    stock_list = ak.stock_zh_a_spot()
+    # 创建一个字典，键为股票代码，值为股票名称
+    stock_dict = {row['代码']: row['名称'] for _, row in stock_list.iterrows()}
+    user_tokens["stocks"]=stock_dict
+
 
 if __name__ == '__main__':
+    get_A_stocks()
+    # 定时任务：每 10 秒执行一次 job_function
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(get_A_stocks, 'interval', seconds=3600)
+    scheduler.start()
     app.run("0.0.0.0",port=8080)
