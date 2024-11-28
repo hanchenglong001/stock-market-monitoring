@@ -1,0 +1,9 @@
+{
+  "update": 3,
+  "bk_update": 120,
+  "stocks":[
+    {"name":"上证指数","code":"sh000001","cost":"0"},
+    {"name":"天润股份","code":"sh600419","cost":"10.455"},
+    {"name":"辽宁成大","code":"sh600739","cost":"13.378"}
+  ]
+}
