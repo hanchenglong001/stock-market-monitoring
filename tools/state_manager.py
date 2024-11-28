@@ -24,7 +24,7 @@ class StateManager_Box:
             ##窗口可见状态
             self.set_state("window_state", 1)
 
-            self.set_state("update", 3)
+            self.set_state("ms", 3)
             self.set_state("bkms", 120)
 
         else:

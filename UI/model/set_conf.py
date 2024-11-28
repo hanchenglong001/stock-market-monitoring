@@ -10,7 +10,7 @@ def create_modify_config_window(root):
         new_update_interval = entry_update_interval.get()
         new_bk_update_interval = entry_bk_update_interval.get()
         # 保存到 State_Box 或者其他持久化存储
-        State_Box.set_state("update", new_update_interval)
+        State_Box.set_state("ms", new_update_interval)
         State_Box.set_state("bkms", new_bk_update_interval)
         change_list=[
             {"key":"update","new_value":new_update_interval},
@@ -32,7 +32,7 @@ def create_modify_config_window(root):
     entry_bk_update_interval = add_labeled_entry(modify_config_window, "板块行情间隔:")
 
     # 默认填充已有的配置值
-    entry_update_interval.insert(0, State_Box.get_state("update"))
+    entry_update_interval.insert(0, State_Box.get_state("ms"))
     entry_bk_update_interval.insert(0, State_Box.get_state("bkms"))
 
     entry_update_interval.pack()

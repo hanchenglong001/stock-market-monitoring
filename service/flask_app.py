@@ -2,8 +2,7 @@ import hashlib
 import json
 import os
 from flask import Flask, request, jsonify
-import akshare as ak
-from apscheduler.schedulers.background import BackgroundScheduler
+# import akshare as ak
 
 app = Flask(__name__)
 
@@ -26,8 +25,9 @@ def hello_world():
     return 'Hello from Flask!'
 
 user_tokens={}
-user_tokens["users"] = get_all_files("./config")
+user_tokens["users"] = get_all_files("config")
 # 验证 token 是否有效
+print(user_tokens)
 
 
 def verify_token(token):
@@ -94,7 +94,7 @@ def create_user_info():
     if password_md5 in user_tokens.get("users"):
         return jsonify({"code":"1","message":"账号已经存在"})
     else:
-        with open(f'./config/{password_md5}.json','w',encoding="utf-8") as f:
+        with open(f'config/{password_md5}.json','w',encoding="utf-8") as f:
             f.write("{}")
         user_tokens.get("users").append(password_md5)
         return jsonify({"code":"0","message":f"{username} 用户创建成功"})
@@ -106,8 +106,7 @@ def get_stock_info():
     token = request.headers.get('Authorization')
     if token in user_tokens.get("users"):
         ##读取json文件
-        with open(f'./config/{token}.json','r',encoding="utf-8") as f:
-            data = json.load(f)
+        data=get_json_info(token)
         return jsonify({"code":"0","data":data})
 
 
@@ -193,7 +192,7 @@ def del_stock_info():
 
 def get_json_info(path):
     ###获取json文件，然后修改覆盖原来的
-    with open(f'./config/{path}.json', 'r', encoding="utf-8") as f:
+    with open(f'config/{path}.json', 'r', encoding="utf-8") as f:
         content = f.read()
         if not content:  # 文件为空
             return {}
@@ -202,7 +201,7 @@ def get_json_info(path):
 
 def set_json_info(path,json_data):
     try:
-        with open(f'./config/{path}.json', 'w', encoding='utf-8') as file:
+        with open(f'config/{path}.json', 'w', encoding='utf-8') as file:
             json.dump(json_data, file, ensure_ascii=False, indent=4)  # 将数据写回文件
         return True
     except Exception:
@@ -211,25 +210,20 @@ def set_json_info(path,json_data):
 
 @app.route('/get/stock/a', methods=['GET'])
 def get_stocks():
-    stocks=user_tokens.get("stocks")
+    stocks=get_json_info("A_stock.json")
     if stocks:
         return stocks
     else:
         return jsonify({})
 
 
-def get_A_stocks():
-    # 获取所有 A 股的股票代码
-    stock_list = ak.stock_zh_a_spot()
-    # 创建一个字典，键为股票代码，值为股票名称
-    stock_dict = {row['代码']: row['名称'] for _, row in stock_list.iterrows()}
-    user_tokens["stocks"]=stock_dict
+# def get_A_stocks():
+#     # 获取所有 A 股的股票代码
+#     stock_list = ak.stock_zh_a_spot()
+#     # 创建一个字典，键为股票代码，值为股票名称
+#     stock_dict = {row['代码']: row['名称'] for _, row in stock_list.iterrows()}
+#     set_json_info("A_stock",stock_dict)
 
-
-if __name__ == '__main__':
-    get_A_stocks()
-    # 定时任务：每 10 秒执行一次 job_function
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(get_A_stocks, 'interval', seconds=3600)
-    scheduler.start()
-    app.run("0.0.0.0",port=8080)
+# if __name__ == '__main__':
+#     # get_A_stocks()
+#     app.run("0.0.0.0",port=8080,debug=False)

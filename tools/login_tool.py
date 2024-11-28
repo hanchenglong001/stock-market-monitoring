@@ -1,8 +1,8 @@
 from tools.state_manager import State_Box
 import requests
 
-url='http://10.15.48.250:8080'
-# url='https://349563332.pythonanywhere.com'
+# url='http://10.15.48.250:8080'
+url='https://349563332.pythonanywhere.com'
 
 def get_user_info(user,passwd):
     json={
@@ -33,10 +33,12 @@ def get_stock_info():
         stocks = result.get("data").get("stocks")
         ms = result.get("data").get("update")
         bkms = result.get("data").get("bk_update")
-        State_Box.set_state("stocks", stocks)
-        State_Box.set_state("bkms", bkms)
-        State_Box.set_state("ms", ms)
-
+        if stocks:
+            State_Box.set_state("stocks", stocks)
+        if bkms:
+            State_Box.set_state("bkms", bkms)
+        if ms:
+            State_Box.set_state("ms", ms)
         return True
     else:
         return False

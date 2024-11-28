@@ -7,7 +7,7 @@ from UI.model.nephogram import open_stock_plate
 from UI.model.bk_show import show_dropdown_bk
 from UI.small_module.about_software import software_info
 from UI.model.set_conf import create_modify_config_window
-# from UI.model.stock_add_del import show_dropdown_bk
+from UI.model.stock_add_del import add_stock_window,del_stock_window
 
 
 
@@ -44,7 +44,9 @@ def creat_ico(self):
         item( "展示/隐藏", self.minimize_to_tray),
         item( "设置",Menu(
             # item("添加/删除股票",),
-            item("配置修改",lambda: create_modify_config_window(self.root))
+            item("配置修改",lambda: create_modify_config_window(self.root)),
+            item("添加自选股股票",lambda: add_stock_window(self.root)),
+            item("删除自选股股票",lambda: del_stock_window(self.root))
         )),
         item('关闭', self.quit_window)
     ))
