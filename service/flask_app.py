@@ -94,8 +94,9 @@ def create_user_info():
     if password_md5 in user_tokens.get("users"):
         return jsonify({"code":"1","message":"账号已经存在"})
     else:
-        with open(f'config/{password_md5}.json','w',encoding="utf-8") as f:
-            f.write("{}")
+        if not password_md5 in get_all_files("config"):
+            with open(f'config/{password_md5}.json','w',encoding="utf-8") as f:
+                f.write("{}")
         user_tokens.get("users").append(password_md5)
         return jsonify({"code":"0","message":f"{username} 用户创建成功"})
 
@@ -210,9 +211,9 @@ def set_json_info(path,json_data):
 
 @app.route('/get/stock/a', methods=['GET'])
 def get_stocks():
-    stocks=get_json_info("A_stock.json")
+    stocks=get_json_info("A_stock")
     if stocks:
-        return stocks
+        return jsonify(stocks)
     else:
         return jsonify({})
 

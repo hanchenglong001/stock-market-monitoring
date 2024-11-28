@@ -49,3 +49,8 @@ def config_update(change_list):
         return True
     else:
         return False
+
+
+def get_a_stock() -> dict:
+    result=requests.get(f"{url}/get/stock/a",headers={"Authorization":State_Box.get_state("token")}).json()
+    return result
