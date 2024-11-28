@@ -2,19 +2,12 @@ from tkinter import Tk, Label, Frame,Menu
 from threading import Thread
 from datetime import datetime
 
-from config import init_conf
 from tools.market_data_tool import get_stock_data
 from tools.ico_tool import creat_ico
 from tools.state_manager import State_Box
 from UI.small_module.notify_box import notify_box
+from UI.model.login_model import create_login_window
 
-
-
-stocks = init_conf.get_keys("stock")
-ms = init_conf.get_value("update", 'time')
-bkms = init_conf.get_value("bk_upate", 'time')
-State_Box.set_state("stocks", stocks)
-State_Box.set_state("bkms", bkms)
 
 class jk_ui:
     def __init__(self):
@@ -41,10 +34,14 @@ class jk_ui:
         self.root.bind("<B1-Motion>", self.on_motion)
         # 启动实时更新线程
         self.update_label()
+
         # 透明浮窗设置
         self.make_window_topmost_and_transparent()
-        # 进入主循环
-        self.root.mainloop()
+
+        # # 进入主循环
+        # self.root.mainloop()
+
+
 
     def quit_window(self, icon, item):
         """ 退出程序 """
@@ -75,7 +72,7 @@ class jk_ui:
         now = datetime.now()
         if 9 <= now.hour < 16 or len(self.stock_frame.winfo_children()) == 0:
             try:
-                stock_values = get_stock_data(stocks)
+                stock_values = get_stock_data(State_Box.get_state("stocks"))
                 for widget in self.stock_frame.winfo_children():
                     widget.destroy()
 
@@ -115,6 +112,7 @@ class jk_ui:
                 print(f"Error: {e}")
                 stock_label = Label(self.stock_frame, text="获取数据失败", bg="black", font=("Arial", 18))
                 stock_label.pack(anchor="w")
+        ms =State_Box.get_state("ms") if State_Box.get_state("ms") else 5
         self.root.after(int(ms) * 1000, self.update_label)
 
     def make_window_topmost_and_transparent(self):
@@ -134,8 +132,7 @@ class jk_ui:
 
 if __name__ == '__main__':
     jk_ui = jk_ui()
-    jk_ui.creat_main_ui()
-
+    create_login_window(jk_ui)
 
 
 

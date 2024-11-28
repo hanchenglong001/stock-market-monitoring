@@ -7,8 +7,8 @@ from UI.small_module.labeled_entry import add_labeled_entry
 
 def send_warning(root):
     def get_stock_jg():
-        stock_name=selected_stock.get()
-        stock_data = get_stock_data(stock_name).get(stock_name)
+        stock_name=eval(selected_stock.get())
+        stock_data = get_stock_data(stock_name).get(stock_name.get("name"))
 
         entry_cost.delete(0, 'end')  # 清空输入框
         entry_cost.insert(0, stock_data[1])  # 插入当前价格
@@ -33,7 +33,8 @@ def send_warning(root):
     selected_stock = StringVar(value=stocks[0])
     Label(yujing_window, text="选择股票:").pack()
     for stock in stocks:
-        Radiobutton(yujing_window, text=stock, variable=selected_stock, value=stock).pack(anchor='w')
+        stock_name=stock.get("name")
+        Radiobutton(yujing_window, text=stock_name, variable=selected_stock, value=stock).pack(anchor='w')
     Button(yujing_window, text="获取股票数据", command=get_stock_jg).pack()
 
     # 将标签和输入框放在同一行

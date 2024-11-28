@@ -21,9 +21,11 @@ class StateManager_Box:
             self.set_state("ljg_value", 0)
             ##预警下限状态
             self.set_state("yj_l_status", 0)
-
             ##窗口可见状态
             self.set_state("window_state", 1)
+
+            self.set_state("update", 3)
+            self.set_state("bkms", 120)
 
         else:
             # 如果已经初始化过，则不执行初始化代码

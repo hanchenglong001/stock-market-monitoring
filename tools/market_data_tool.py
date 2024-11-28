@@ -1,4 +1,3 @@
-from config import init_conf
 import requests
 
 
@@ -15,17 +14,15 @@ def get_stock_data(stocks):
     ##查看如此是否是list
     if not isinstance(stocks, list):
         stocks = [stocks]
-
     stock_data = {}
-
-    for stock_name in stocks:
-        # 获取配置中的股票信息
-        stock_value = init_conf.get_value("stock", stock_name)
-        stock_symbol, stock_ben = stock_value.split(";", 1) if ';' in stock_value else (stock_value, "0")
-
+    for stock_one in stocks:
+        if not isinstance(stock_one, dict):
+            stock_one=eval(stock_one)
+        stock_symbol=stock_one.get("code")
+        stock_name=stock_one.get("name")
+        stock_ben=stock_one.get("cost")
         # 获取股票数据
         data = fetch_stock_data(stock_symbol)
-
         # 解析数据
         if len(data) > 30:
             current_index = data[3]
