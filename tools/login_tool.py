@@ -54,3 +54,25 @@ def config_update(change_list):
 def get_a_stock() -> dict:
     result=requests.get(f"{url}/get/stock/a",headers={"Authorization":State_Box.get_state("token")}).json()
     return result
+
+def add_stock(code,name,cost="0"):
+    json_data={
+        "code":code,
+        "name":name,
+        "cost":cost
+    }
+    result=requests.post(f"{url}/stock/add",headers={"Authorization":State_Box.get_state("token")},json=json_data).json()
+    if result.get("code")=="0":
+        return True,result
+    else:
+        return False,result
+
+def del_stock(code):
+    json_data={
+        "code":code
+    }
+    result=requests.post(f"{url}/stock/del",headers={"Authorization":State_Box.get_state("token")},json=json_data).json()
+    if result.get("code")=="0":
+        return True,result
+    else:
+        return False,result

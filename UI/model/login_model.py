@@ -1,8 +1,26 @@
 import tkinter as tk
-from tkinter import Label, Frame, Toplevel,Menu,Toplevel,Entry,Button,messagebox
+from tkinter import Label, Frame, Toplevel,Menu,Toplevel,Entry,Button
 from bottle import response
 from tools.login_tool import get_user_info,create_user_info,get_stock_info
 from tools.state_manager import State_Box
+
+
+def show_custom_error(root, error_message):
+    # 获取主窗口的位置和大小
+    root_x = root.winfo_rootx()
+    root_y = root.winfo_rooty()
+    # 创建一个新的Toplevel窗口来展示错误信息
+    error_window = Toplevel(root)
+    error_window.title("提示")
+    error_window.geometry(f"100x100+{root_x}+{root_y - 110}")
+
+    # 创建一个Label，显示错误消息
+    error_label = Label(error_window, text=error_message, wraplength=350, justify="left")
+    error_label.pack(padx=20, pady=20, fill="both")
+
+
+    error_window.grab_set()  # 阻止用户与其他窗口交互，直到关闭当前窗口
+    error_window.mainloop()
 
 def create_login_window(root_jk):
     root=root_jk.root
@@ -44,7 +62,7 @@ def create_login_window(root_jk):
             if get_stock_info():
                 root_jk.creat_main_ui()  # 打开主界面
         else:
-            messagebox.showerror(result[1].get("message"))
+            show_custom_error(login_button,result[1].get("message"))
 
     # 登录按钮
     def create_action():
@@ -52,9 +70,9 @@ def create_login_window(root_jk):
         password = password_entry.get()
         result=create_user_info(username,password)
         if result[0]:
-            messagebox.showerror(result[1].get("message"))
+            show_custom_error(login_button,result[1].get("message"))
         else:
-            messagebox.showerror(result[1].get("message"))
+            show_custom_error(login_button,result[1].get("message"))
 
     # 登录按钮
     def any_action():

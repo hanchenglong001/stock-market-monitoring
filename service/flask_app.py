@@ -162,6 +162,9 @@ def add_stock_info():
         json_data = get_json_info(token)
         if not json_data.get("stocks"):
             json_data["stocks"]=[]
+        for stock in json_data["stocks"]:
+            if name in stock.get("name"):
+                return jsonify({"code": "1", "message": "自选股中存在这只股票"})
         json_data["stocks"].append({"name": name,"code": code,"cost": cost})
         if set_json_info(token,json_data):
             return jsonify({"code":"0","message":"修改成功"})
