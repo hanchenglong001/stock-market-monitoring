@@ -95,8 +95,12 @@ def create_user_info():
         return jsonify({"code":"1","message":"账号已经存在"})
     else:
         if not password_md5 in get_all_files("config"):
-            with open(f'config/{password_md5}.json','w',encoding="utf-8") as f:
-                f.write("{}")
+            json_data={
+                "update": "3",
+                "bk_update": "120",
+                "stocks": [{"name": "上证指数","code": "sh000001","cost": "0"}]
+            }
+            set_json_info(password_md5,json_data)
         user_tokens.get("users").append(password_md5)
         return jsonify({"code":"0","message":f"{username} 用户创建成功"})
 
