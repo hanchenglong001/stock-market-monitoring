@@ -105,14 +105,12 @@ class jk_ui:
                                         bg="black", font=("Arial", 10))
                     stock_label.pack(anchor="w")
                     stock_label.update_idletasks()
-                    max_width = max(max_width, stock_label.winfo_width())
-
-                self.root.geometry(f"{self.root.winfo_width()}x{self.stock_frame.winfo_height() + 20}")
+                self.root.geometry(f"{self.stock_frame.winfo_reqwidth()}x{self.stock_frame.winfo_reqheight() + 20}")
             except Exception as e:
                 print(f"Error: {e}")
                 stock_label = Label(self.stock_frame, text="获取数据失败", bg="black", font=("Arial", 18))
                 stock_label.pack(anchor="w")
-        ms =State_Box.get_state("ms") if State_Box.get_state("ms") else 5
+        ms =State_Box.get_state("ms") if State_Box.get_state("ms") else 3
         self.root.after(int(ms) * 1000, self.update_label)
 
     def make_window_topmost_and_transparent(self):
